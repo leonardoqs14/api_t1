@@ -1,31 +1,7 @@
-from flask import Flask  # Importamos a classe Flask do módulo flask para criar nosso aplicativo web
+from flask import Flask,request,jsonify  # Importamos a classe Flask do módulo flask para criar nosso aplicativo web
 
 import sqlite3
-
-# Criamos uma instância do Flask e armazenamos na variável "app"
-# O parâmetro __name__ indica que este arquivo será reconhecido como o principal da aplicação
-app = Flask(__name__)
-
-# Aqui estamos criando uma rota para o endpoint "/"
-# Ou seja, quando acessarmos http://127.0.0.1:5000/, a função abaixo será executada
-@app.route("/")
-def pagar_pessoas():
-    # Retorna uma mensagem formatada em HTML para ser exibida na página principal
-    return "<h1>Começar a semana, pagando suas dívidas, é bom demais</h1>"
-
-# Criamos uma rota para o endpoint "/pix"
-# Quando acessarmos http://127.0.0.1:5000/pix, a função será chamada automaticamente
-@app.route("/pix")
-def mande_o_pix():
-    # Retorna uma mensagem formatada em HTML para ser exibida na rota "/pix"
-    return "<h3>Pagar as pessoas faz bem pras pessoas!!! =D</h3>"
-
-# Criamos uma rota para o endpoint "/comidas"
-# Quando acessarmos http://127.0.0.1:5000/comidas, essa função será executada
-@app.route("/comidas")
-def prato_do_dia():
-    # Retorna uma mensagem formatada em HTML descrevendo o prato do dia
-    return "<h1>O prato do dia é feijoada com farofinha com bacon e de sobremesa brownie com sorvete!!!</h1>"
+app=Flask(__name__)
 
 def init_db():
     #Crie o nosso banco de dados com um arquivo "database.db" e conecte a variavel conn (Connection)
@@ -37,12 +13,45 @@ def init_db():
                     titulo TEXT NOT NULL,
                     categoria TEXT NOT NULL,
                     autor TEXT NOT NULL,
-                    imagem_url TEXT NOT NULL
+                    image_url TEXT NOT NULL
                 )
             """
         )
 
 init_db()
+
+@app.route("/doar", methods=["POST"])
+def doar():
+
+    dados = request.get_json()
+
+    titulo = dados.get("titulo")
+    categoria = dados.get("categoria")
+    autor = dados.get("autor")
+    image_url = dados.get("image_url")
+
+    if not titulo or not categoria or not autor or not  image_url:
+        return jsonify({"erro":"Todos os campos são obrigatorios"}),400
+    
+    with sqlite3.connect("database.db") as conn:
+        conn.execute(f"""
+        INSERT INTO LIVROS(titulo, categoria, autor, image_url)
+        VALUES ("{titulo}", "{categoria}", "{autor}", "{image_url}")
+        """)
+    
+        conn.commit()
+
+        return jsonify({"Mensagem": "Livro cadastrado com sucesso"}), 201
+
+
+
+
+
+
+
+
+
+
 
 
 
