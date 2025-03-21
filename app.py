@@ -20,6 +20,11 @@ def init_db():
 
 init_db()
 
+@app.route("/")
+def home():
+    return jsonify(f"Bem vindo a API Livros")
+
+
 @app.route("/doar", methods=["POST"])
 def doar():
 
@@ -45,12 +50,25 @@ def doar():
 
 
 
+@app.route("/livros", methods=["GET"])
+def listar_livros():
 
+    with sqlite3.connect("database.db") as conn:
+        livros = conn.execute("SELECT * FROM LIVROS").fetchall()
 
+        livros_formatados = []
 
+        for item in livros:
+            dicionario_livros = {
+                "id": item[0],
+                "titulo":item[1],
+                "categoria":item[2],
+                "autor":item[3],
+                "image_url":item[4]
+            }
+            livros_formatados.append(dicionario_livros)
 
-
-
+    return jsonify(livros_formatados)
 
 
 
