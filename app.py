@@ -1,7 +1,8 @@
 from flask import Flask,request,jsonify  # Importamos a classe Flask do módulo flask para criar nosso aplicativo web
-
+from flask_cors import CORS
 import sqlite3
 app=Flask(__name__)
+CORS(app)
 
 def init_db():
     #Crie o nosso banco de dados com um arquivo "database.db" e conecte a variavel conn (Connection)
